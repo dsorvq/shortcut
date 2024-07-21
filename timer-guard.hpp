@@ -1,3 +1,5 @@
+#pragma once
+
 #include <random>
 #include <string>
 #include <iostream>
@@ -5,7 +7,7 @@
 
 class TimerGuard {
 public:
-  TimerGuard(std::string message = "", std::ostream& out = std::cout)
+  TimerGuard(std::string_view message = "", std::ostream& out = std::cout)
     : start(std::chrono::high_resolution_clock::now())
     , outMessage(message)
     , outStream(out)
@@ -24,6 +26,6 @@ public:
 
 private:
   std::chrono::time_point<std::chrono::high_resolution_clock> start;
-  std::string outMessage;
+  std::string_view outMessage;
   std::ostream& outStream;
 };
