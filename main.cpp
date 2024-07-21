@@ -2,19 +2,18 @@
 #include <vector>
 #include <cassert>
 #include <random>
+#include <string_view>
 
 #include "shortcut.hpp"
 #include "timer-guard.hpp"
 
 void test_correctness();
-void test_performance(auto alorithm, int n);
+void test_performance(auto alorithm, int n, std::string_view message = "");
 
 int main() {
-#ifdef TEST
   test_correctness();
-#else
-  test_performance(shortcut, 2000);
-#endif
+  test_performance(baseline, 2000, "baseline:");
+  test_performance(shortcut, 2000, "shortcut:");
 } 
 
 matrix get_random_square_matrix(int n) {
@@ -59,13 +58,15 @@ void test_correctness() {
 
   test_for_n(3);
   test_for_n(4);
+
+  std::cout << "Correctness tests passed" << std::endl;
 }
 
-void test_performance(auto alorithm, int n) {
+void test_performance(auto alorithm, int n, std::string_view message) {
   auto mat = get_random_square_matrix(n);
 
   {
-    TimerGuard tg("time:");
+    TimerGuard tg(message);
     auto result = alorithm(mat);
   }
 }
