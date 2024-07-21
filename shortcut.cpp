@@ -4,25 +4,44 @@
 
 matrix shortcut(const matrix& distances) {
   const int n = distances.size();
+  constexpr int multiple = 20;
+  constexpr auto infty = std::numeric_limits<float>::infinity();
 
-  matrix trasnposed(n, matrix_row(n));
+  int npadded = ((n + multiple + 1) / multiple) * multiple;
+
+  matrix trasnposed_padded(n, matrix_row(npadded, infty));
+  matrix distances_padded(n, matrix_row(npadded, infty));
+
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
-      trasnposed[j][i] = distances[i][j];
+      trasnposed_padded[j][i] = distances[i][j];
+      distances_padded[i][j] = distances[i][j];
     }
   }
   
   matrix result(n, matrix_row(n));
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
-      auto path_ij = std::numeric_limits<float>::infinity();
-      for (int k = 0; k < n; ++k) {
-        auto x = distances[i][k];
-        auto y = trasnposed[j][k];
-        auto z = x + y;
-        path_ij = std::min(path_ij, z);
+
+      float path_ij[multiple];
+      for (int p = 0; p < multiple; ++p) {
+        path_ij[p] = infty;
       }
-      result[i][j] = path_ij;
+
+      for (int k = 0; k < npadded; k += multiple) {
+        for (int p = 0; p < multiple; ++p) {
+          auto x = distances_padded[i][k + p];
+          auto y = trasnposed_padded[j][k + p];
+          auto z = x + y;
+          path_ij[p] = std::min(path_ij[p], z);
+        }
+      }
+
+      float v = infty;
+      for (int p = 0; p < multiple; ++p) {
+        v = std::min(v, path_ij[p]);
+      }
+      result[i][j] = v;
     }
   }
 
